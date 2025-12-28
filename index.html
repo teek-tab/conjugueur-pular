@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conjugueur de Verbes Peul</title>
+  <style>
+    :root {
+      --primary: #4a5568;        /* Gris-bleu foncé */
+      --primary-light: #718096;  /* Gris moyen */
+      --primary-dark: #2d3748;   /* Gris très foncé */
+      --accent: #5a67d8;         /* Indigo subtil pour les accents */
+      --bg-light: #f7fafc;       /* Fond très clair */
+      --card-bg: #ffffff;        /* Blanc pur pour les cartes */
+      --border: #e2e8f0;         /* Bordure douce */
+      --text: #2d3748;           /* Texte principal */
+      --text-light: #718096;     /* Texte secondaire */
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      padding: 16px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .app-container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 16px 0;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: var(--text-light);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-light);
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.15);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-grid-full {
+      grid-column: 1 / -1;
+    }
+
+    /* Button */
+    .btn-conjugate {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(74, 85, 104, 0.25);
+      margin-top: 8px;
+    }
+
+    .btn-conjugate:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(74, 85, 104, 0.3);
+    }
+
+    .btn-conjugate:active {
+      transform: translateY(0);
+    }
+
+    /* Results */
+    .results-card {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .results-card.show {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .results-header {
+      background: var(--primary);
+      color: white;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .results-header h2 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .results-header p {
+      font-size: 14px;
+      opacity: 0.95;
+      margin-top: 4px;
+    }
+
+    .conjugation-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .conjugation-item {
+      background: var(--bg-light);
+      padding: 16px;
+      border-radius: 10px;
+      border-left: 4px solid var(--accent);
+      transition: all 0.2s ease;
+    }
+
+    .conjugation-item:hover {
+      background: #edf2f7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .conjugation-result {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    /* Note */
+    .note {
+      background: var(--bg-light);
+      border-left: 4px solid var(--primary-light);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      color: var(--text-light);
+      margin-top: 16px;
+    }
+
+    /* Responsive */
+    @media (min-width: 640px) {
+      body { padding: 32px; }
+      .header h1 { font-size: 32px; }
+      .conjugation-grid { grid-template-columns: repeat(3, 1fr); }
+      .form-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .conjugation-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <h1 style="background-color: rgb(74, 85, 104); color: white; border-radius: 10px; padding: 7px;">Conjugueur Pular</h1>
+      <p>Conjugaison simple et standard en pular</p>
+      <p style="color: red">NB: Est en cours de développement</p>
+    </div>
+
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label" for="verbe">Verbe à l’infinitif</label>
+        <input type="text" id="verbe" class="form-input" placeholder="Ex: windugol">
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="type">Groupe de verbe</label>
+          <select id="type" class="form-select">
+            <option value="ugol">ugol</option>
+            <option value="agol">agol</option>
+            <option value="egol">egol</option>
+            <option value="gol">irgol / angol</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="temps">Temps</label>
+          <select id="temps" class="form-select">
+            <option value="present">Présent</option>
+            <option value="continu">Continu</option>
+            <option value="passe">Passé</option>
+          </select>
+        </div>
+
+        <div class="form-group form-grid-full">
+          <label class="form-label" for="mode">Mode</label>
+          <select id="mode" class="form-select">
+            <option value="aff">Affirmatif</option>
+            <option value="neg">Négatif</option>
+            <option value="int">Interrogatif</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-conjugate" onclick="conjuguer()">Conjuguer</button>
+    </div>
+
+    <div class="card results-card" id="resultsCard">
+      <div class="results-header">
+        <h2 id="resultsTitle">Résultats</h2>
+        <p id="resultsSubtitle"></p>
+      </div>
+
+      <div class="conjugation-grid" id="conjugationList"></div>
+
+      <div class="note" id="note"></div>
+    </div>
+  </div>
+
+  <footer style="margin-top: 48px; padding: 32px 16px; background: var(--card-bg); border-top: 1px solid var(--border);">
+    <div class="app-container" style="max-width: 720px; margin: 0 auto; text-align: center;">
+        
+        <p style="font-size: 15px; color: var(--text-light); margin-bottom: 16px;">
+        Conjugueur gratuit de verbes en <strong>Pular</strong><br>
+        Outil créé pour faciliter l’apprentissage de la langue pular.
+        </p>
+
+        <p style="font-size: 16px; color: var(--primary-dark); margin-bottom: 20px;">
+        Partagez cet outil autour de vous !
+        </p>
+
+        <!-- Icônes de partage -->
+        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        
+        <!-- WhatsApp -->
+        <a href="https://wa.me/?text=Regardez%20ce%20conjugueur%20gratuit%20de%20verbes%20en%20Fulfulde%20!%20%F0%9F%93%9A%0A%0AConjuguez%20facilement%20les%20verbes%20en%20présent%2C%20continu%20et%20passé.%0A%E2%86%92%20{{URL}}"
+            target="_blank" rel="noopener"
+            style="display: inline-flex; align-items: center; gap: 8px; color: #25D366; font-size: 14px; text-decoration: none; font-weight: 600;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 0 5.496 0 12.05c0 2.454.795 4.727 2.141 6.787l-2.147 7.847 8.046-2.114a11.814 11.814 0 005.074 1.008c6.555 0 11.887-5.332 11.887-11.886 0-3.177-1.274-6.159-3.587-8.4-.993-.992-2.295-1.545-3.686-1.545z"/></svg>
+            WhatsApp
+        </a>
+
+        <!-- Facebook -->
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{URL}}"
+            target="_blank" rel="noopener"
+            style="color: #1877F2; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; text-decoration: none; font-weight: 600;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Facebook
+        </a>
+
+        <!-- Instagram (lien vers bio ou story - partage direct limité) -->
+        <a href="https://www.instagram.com/" target="_blank" rel="noopener"
+            style="color: #E4405F; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; text-decoration: none; font-weight: 600;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.059 1.689.073 4.948.073 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            Instagram
+        </a>
+
+        <!-- TikTok -->
+        <a href="https://www.tiktok.com/" target="_blank" rel="noopener"
+            style="color: #000000; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; text-decoration: none; font-weight: 600;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.69 7.995c-1.381-1.005-2.146-2.43-2.146-3.995V0h-4.167v16.26c0 1.842-1.5 3.333-3.333 3.333-1.842 0-3.334-1.491-3.334-3.333 0-1.841 1.492-3.333 3.334-3.333.458 0 .896.09 1.302.25V8.99c-.416-.08-.848-.13-1.302-.13C6.667 8.86 4 11.527 4 15.094c0 3.568 2.667 6.24 6.24 6.24 3.344 0 6.093-2.542 6.24-5.76V9.963c1.01.708 2.208 1.125 3.52 1.125V6.99c-1.312 0-2.51-.417-3.51-1.995z"/></svg>
+            TikTok
+        </a>
+
+        <!-- YouTube -->
+        <a href="https://www.youtube.com/" target="_blank" rel="noopener"
+            style="color: #FF0000; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; text-decoration: none; font-weight: 600;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            YouTube
+        </a>
+
+        <!-- X (Twitter) -->
+        <a href="https://twitter.com/intent/tweet?text=Conjugueur%20gratuit%20de%20verbes%20en%20Fulfulde%20!%20%F0%9F%93%9A&url={{URL}}"
+            target="_blank" rel="noopener"
+            style="color: #000000; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; text-decoration: none; font-weight: 600;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            X
+        </a>
+        
+        </div>
+
+        <p style="font-size: 14px; color: var(--text-light);">
+        © 2025-2026 Thierno Amadou BAH • Tous droits réservés
+        </p>
+        
+        <p style="font-size: 13px; color: var(--text-light); margin-top: 12px;">
+        Fait avec ❤️ pour tous
+        </p>
+    </div>
+    </footer>
+
+  <script>
+    const pronomsCont = ["Lan", "Ɗa", "Mo", "Ɗen", "Ɗon", "Ɓe"];
+    const pronomsSujet = ["Mi", "A", "O", "En", "On", "Be"];
+
+    const irreguliers = {
+      "faalegol": { base: "faal", specialPresentAff: "aa" },
+      "yidugol": { base: "yid", specialPresentAff: "ii" }
+    };
+
+    function getBase(verbe) {
+      verbe = verbe.trim().toLowerCase();
+      if (irreguliers[verbe]) return irreguliers[verbe].base;
+      if (verbe.endsWith("ugol")) return verbe.slice(0, -4);
+      if (verbe.endsWith("agol")) return verbe.slice(0, -4);
+      if (verbe.endsWith("egol")) return verbe.slice(0, -4);
+      if (verbe.endsWith("irgol") || verbe.endsWith("angol") || verbe.endsWith("gol")) {
+        return verbe.slice(0, -3);
+      }
+      return verbe;
+    }
+
+    function conjuguer() {
+      const verbeInput = document.getElementById("verbe").value.trim();
+      const type = document.getElementById("type").value;
+      const temps = document.getElementById("temps").value;
+      const mode = document.getElementById("mode").value;
+
+      if (!verbeInput) {
+        alert("Veuillez entrer un verbe !");
+        return;
+      }
+
+      let base = getBase(verbeInput);
+      const verbeOrig = verbeInput.toLowerCase();
+      let formes = [];
+
+      const estFaalegol = verbeOrig === "faalegol";
+      const estYidugol = verbeOrig === "yidugol";
+
+      for (let i = 0; i < 6; i++) {
+        let forme = "";
+
+        if (temps === "present") {
+          if (type === "ugol") {
+            if (mode === "aff") {
+              const suffixe = (estFaalegol && irreguliers[verbeOrig]?.specialPresentAff) ? irreguliers[verbeOrig].specialPresentAff : 
+                              (estYidugol && irreguliers[verbeOrig]?.specialPresentAff) ? irreguliers[verbeOrig].specialPresentAff : "a";
+              forme = pronomsCont[i] + " " + base + suffixe;
+            } else if (mode === "neg") {
+              forme = pronomsSujet[i] + " " + base + "ataa";
+            } else if (mode === "int") {
+              forme = (i < 3 ? pronomsSujet[i] : pronomsCont[i]) + " " + base + "ataa?";
+            }
+          }
+          else if (type === "agol") {
+            forme = pronomsCont[i] + " " + base + "o";
+          }
+          else if (type === "egol") {
+            forme = pronomsCont[i] + " " + base + "ee";
+          }
+          else if (type === "gol") {
+            forme = pronomsCont[i] + " " + base + "a";
+          }
+
+        } else if (temps === "continu") {
+          if (type === "ugol") {
+            if (mode === "aff") {
+              forme = pronomsCont[i] + " " + base + "ude";
+            } else if (mode === "neg") {
+              forme = pronomsSujet[i] + " alaa " + base + "ude";
+            } else if (mode === "int") {
+              const wonForms = ["wonii", "wonii", "wonii", "wonii", "wonii", "wonii"];
+              forme = pronomsSujet[i] + " " + wonForms[i] + " " + base + "ude?";
+            }
+          }
+          else if (type === "agol") {
+            forme = pronomsCont[i] + " " + base + "aade";
+          }
+          else if (type === "egol") {
+            forme = pronomsCont[i] + " " + base + "eede";
+          }
+          else if (type === "gol") {
+            forme = pronomsCont[i] + " " + base + "de";
+          }
+
+        } else if (temps === "passe") {
+          if (type === "ugol" || type === "gol") {
+            if (mode === "aff") {
+              forme = pronomsSujet[i] + " " + base + "ii";
+            } else if (mode === "neg") {
+              forme = pronomsSujet[i] + " " + base + "aali";
+            } else if (mode === "int") {
+              forme = pronomsSujet[i] + " " + base + "ii?";
+            }
+          }
+          else if (type === "agol") {
+            if (mode === "aff") forme = pronomsSujet[i] + " " + base + "ike";
+            if (mode === "neg") forme = pronomsSujet[i] + " " + base + "aaki";
+            if (mode === "int") forme = pronomsSujet[i] + " " + base + "ike?";
+          }
+          else if (type === "egol") {
+            if (mode === "aff") forme = pronomsSujet[i] + " " + base + "aama";
+            if (mode === "neg") forme = pronomsSujet[i] + " " + base + "aaka";
+            if (mode === "int") forme = pronomsSujet[i] + " " + base + "aama?";
+          }
+        }
+
+        formes.push(forme);
+      }
+
+      // Affichage
+      const listContainer = document.getElementById("conjugationList");
+      listContainer.innerHTML = "";
+      
+      formes.forEach((forme, index) => {
+        const item = document.createElement("div");
+        item.className = "conjugation-item";
+        item.innerHTML = `
+          <div style="font-size:14px; color:var(--text-light); margin-bottom:4px;">
+            ${pronomsCont[index]} / ${pronomsSujet[index]}
+          </div>
+          <div class="conjugation-result">${forme}</div>
+        `;
+        listContainer.appendChild(item);
+      });
+
+      const tempsLabel = temps === "present" ? "Présent" : temps === "continu" ? "Présent continu" : "Passé achevé";
+      const modeLabel = mode === "aff" ? "affirmatif" : mode === "neg" ? "négatif" : "interrogatif";
+      
+      document.getElementById("resultsTitle").textContent = verbeInput;
+      document.getElementById("resultsSubtitle").textContent = `${tempsLabel} — ${modeLabel}`;
+      document.getElementById("note").textContent = `Base du verbe : ${base}`;
+      
+      document.getElementById("resultsCard").classList.add("show");
+    }
+
+    // Conjuguer avec Entrée
+    document.getElementById("verbe").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") conjuguer();
+    });
+  </script>
+</body>
+</html>
